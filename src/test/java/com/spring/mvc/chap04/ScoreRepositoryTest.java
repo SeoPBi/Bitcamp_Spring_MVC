@@ -15,7 +15,6 @@ public class ScoreRepositoryTest {
     // 테스트 대상인 ScoreRepositoryImpl 클래스를 상단에 선언해둡니다.
     ScoreRepository repository = new ScoreRepositoryImpl();
 
-
     @Test
     public void ScoreRepositoryStaticVarTest(){
         // 접근 제한자가 public으로 풀려있는 동안만 실행 가능
@@ -47,11 +46,15 @@ public class ScoreRepositoryTest {
     public void findByStudentNumberTest(){
         // given(2번 학생 정보가 실제 정보와 일치하는지 체크할 예정임)
         int studentNumber = 2;
+
         // when(2번 학생정보를 넣어 findByStudentNumber를 호출하고, 결과는 result에 저장
         Score result = repository.findByStudentNumber(studentNumber);
+
         // then(단언부에는 2개 이상의 단언문이 들어가도 상관 없음)
+
         // 2번 유저의 점수를 얻어왔으므로, getter로 국어성적 조사 시 33점일 것 이다.
         assertEquals(33, result.getKorScore());
+
         // 2번 유저를 얻어왔으므로, getter로 이름 조사 시 "이부트"일 것 이다.
         assertEquals("이부트", result.getName());
     }
@@ -61,8 +64,10 @@ public class ScoreRepositoryTest {
     public void notFindByStudentNumberTest(){
         // given
         int studentNumber = 99;
+
         // when
         Score result = repository.findByStudentNumber(studentNumber);
+
         // then
         assertNull(result); // null이면 통과, 아니면 실패
     }
@@ -76,11 +81,30 @@ public class ScoreRepositoryTest {
         score.setKorScore(100);
         score.setEngScore(70);
         score.setMathScore(80);
+
         // when
         boolean boolResult = repository.save(score);
         List<Score> result = repository.findAll(); // 저장한 후 전체 데이터 가져오기
+
         // then
         assertEquals(4, result.size());
         assertTrue(boolResult); // 실행이 잘되면 true, 뭔가 오류나면 false
+    }
+
+    @Test
+    @DisplayName("저장소에서 2번 학생 삭제 후 리스트 전체 조회시 개수는 2개, 2번 학생 조회는 null")
+    public void deleteTest(){
+        // given 학생 번호를 저장합니다.
+        int studentNumber = 2;
+
+        // when 해당 번호 학생을 삭제합니다. 그리고 findAll()로 전체 데이터를 가져오고, 2번 학생만 가져오기도 다시 합니다.
+        repository.deleteByStudentNumber(studentNumber);
+        List<Score> scoreList = repository.findAll(); // 2개만 가져와짐
+        Score score = repository.findByStudentNumber(studentNumber);
+
+        // then 전체목록의 길이는 2일 것이고, score 변수에는 null이 담긴다고 단언
+        // assertThat(scoreList.size()).isEqualTo(2); // 아래 문장과 같음(Import문 필요)
+        assertEquals(scoreList.size(),2);
+        assertNull(score);
     }
 }
